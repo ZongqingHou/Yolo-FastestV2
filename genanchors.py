@@ -103,17 +103,17 @@ def kmeans(X,centroids,eps,anchor_file, width_in_cfg_file, height_in_cfg_file):
 
 def main(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--traintxt', default = '', 
+    parser.add_argument('--traintxt', default = '/home/houzongqing/test.txt', 
                         help='path to traintxt\n' )
     parser.add_argument('--output_dir', default = './', type = str, 
                         help='Output anchor directory\n' )  
     parser.add_argument('--num_clusters', default = 6, type = int, 
                         help='number of clusters\n' )  
     
-    parser.add_argument('--input_width', default = 352, type = int, 
+    parser.add_argument('--input_width', default = 320, type = int, 
                         help='model input width\n' )  
 
-    parser.add_argument('--input_height', default = 352, type = int, 
+    parser.add_argument('--input_height', default = 320, type = int, 
                         help='model input height\n' )  
    
     args = parser.parse_args()
@@ -130,13 +130,13 @@ def main(argv):
     size = np.zeros((1,1,3))
     for line in lines:
                     
-        #line = line.replace('images','labels')
+        line = line.replace('images','labels')
         #line = line.replace('img1','labels')
-        line = line.replace('JPEGImages','labels')        
+        #line = line.replace('JPE','labels')        
         
 
         line = line.replace('.jpg','.txt')
-        line = line.replace('.png','.txt')
+        #line = line.replace('.png','.txt')
         print(line)
         f2 = open(line)
         for line in f2.readlines():

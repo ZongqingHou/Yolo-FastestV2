@@ -10,7 +10,7 @@ import torch
 from torch import optim
 from torch.utils.data import dataset
 from numpy.core.fromnumeric import shape
-
+from torch.nn import DataParallel
 from torchsummary import summary
 
 import utils.loss
@@ -68,6 +68,7 @@ if __name__ == '__main__':
 
     # 初始化模型结构
     model = model.detector.Detector(cfg["classes"], cfg["anchor_num"], load_param).to(device)
+    model = DataParallel(model, [0,1,2,3], 0)
     summary(model, input_size=(3, cfg["height"], cfg["width"]))
 
     # 加载预训练模型参数
@@ -135,13 +136,13 @@ if __name__ == '__main__':
             model.eval()
             #模型评估
             print("computer mAP...")
-            _, _, AP, _ = utils.utils.evaluation(val_dataloader, cfg, model, device)
+            #_, _, AP, _ = utils.utils.evaluation(val_dataloader, cfg, model, device)
             print("computer PR...")
-            precision, recall, _, f1 = utils.utils.evaluation(val_dataloader, cfg, model, device, 0.3)
-            print("Precision:%f Recall:%f AP:%f F1:%f"%(precision, recall, AP, f1))
+            #precision, recall, _, f1 = utils.utils.evaluation(val_dataloader, cfg, model, device, 0.3)
+            #print("Precision:%f Recall:%f AP:%f F1:%f"%(precision, recall, AP, f1))
 
-            torch.save(model.state_dict(), "weights/%s-%d-epoch-%fap-model.pth" %
-                      (cfg["model_name"], epoch, AP))
+            torch.save(model.state_dict(), "weights/%s-%d-epoch-ap-model.pth" %
+                      (cfg["model_name"], epoch))
 
         # 学习率调整
         scheduler.step()

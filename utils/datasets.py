@@ -62,9 +62,9 @@ def random_resize(img):
 
 def img_aug(img):
     img = contrast_and_brightness(img)
-    #img = motion_blur(img)
-    #img = random_resize(img)
-    #img = augment_hsv(img)
+    img = motion_blur(img)
+    img = random_resize(img)
+    img = augment_hsv(img)
     return img
 
 def collate_fn(batch):
@@ -100,8 +100,8 @@ class TensorDataset():
 
     def __getitem__(self, index):
         img_path = self.data_list[index]
-        label_path = img_path.split(".")[0] + ".txt"
-
+        # label_path = img_path.split(".")[0] + ".txt"
+        label_path = img_path.replace("images", "labels").replace(".jpg", ".txt")
         # 归一化操作
         img = cv2.imread(img_path)
         img = cv2.resize(img, (self.img_size_width, self.img_size_height), interpolation = cv2.INTER_LINEAR) 
