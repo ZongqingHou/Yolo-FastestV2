@@ -131,6 +131,14 @@ class TensorDataset():
                         bbox_classes.append(tmp_info[0])
 
                         tmp_bbox = [float(tmp_p) for tmp_p in tmp_info[1:]]
+                        for index, tmp_ in enumerate(tmp_bbox):
+                            if tmp_ > 1:
+                                tmp_bbox[index] = 0.99
+                            elif tmp_ < 0:
+                                tmp_bbox[index] = 0.01
+                            else:
+                                continue
+
                         bbox.append(tmp_bbox)
 
                     tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
