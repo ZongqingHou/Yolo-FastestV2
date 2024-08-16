@@ -2,8 +2,8 @@
 model_name=palm
 
 [train-configure]
-epochs=300
-steps=150,250
+epochs=150
+steps=75,125
 batch_size=1024
 subdivisions=1
 learning_rate=0.001
@@ -11,8 +11,8 @@ learning_rate=0.001
 [model-configure]
 pre_weights=None
 classes=2
-width=352
-height=352
+width=320
+height=320
 anchor_num=3
 anchors=24.08,76.09, 48.48,71.81, 80.13,33.27, 83.88,130.98, 127.85,78.46, 170.79,140.90
 

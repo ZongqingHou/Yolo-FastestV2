@@ -1,19 +1,20 @@
 import os
-import cv2
 import random
-import numpy as np
 
+import albumentations as A
+import cv2
+import numpy as np
 import torch
-from torch.utils import data
-from torch.utils.data import Dataset
+
 
 def contrast_and_brightness(img):
     alpha = random.uniform(0.25, 1.75)
     beta = random.uniform(0.25, 1.75)
     blank = np.zeros(img.shape, img.dtype)
     # dst = alpha * img + beta * blank
-    dst = cv2.addWeighted(img, alpha, blank, 1-alpha, beta)
+    dst = cv2.addWeighted(img, alpha, blank, 1 - alpha, beta)
     return dst
+
 
 def motion_blur(image):
     if random.randint(1,2) == 1:
@@ -85,6 +86,23 @@ class TensorDataset():
         self.img_formats = ['bmp', 'jpg', 'jpeg', 'png']
         self.imgaug = imgaug
 
+        self.imgaug_operation = A.Compose([
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.OneOf([
+                A.GaussNoise(),  # 将高斯噪声应用于输入图像。
+            ], p=0.2),  # 应用选定变换的概率
+            A.OneOf([
+                A.MotionBlur(p=0.2),  # 使用随机大小的内核将运动模糊应用于输入图像。
+                A.MedianBlur(blur_limit=3, p=0.1),  # 中值滤波
+                A.Blur(blur_limit=3, p=0.1),  # 使用随机大小的内核模糊输入图像。
+            ], p=0.2),
+            A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=1),
+            # 随机应用仿射变换：平移，缩放和旋转输入
+            A.RandomBrightnessContrast(p=0.2),  # 随机明亮对比度
+            A.Resize(self.img_size_width, self.img_size_height),
+        ], bbox_params=A.BboxParams(format="yolo", label_fields=["bbox_classes"]))
+
         # 数据检查
         with open(self.path, 'r') as f:
             for line in f.readlines():
@@ -100,23 +118,41 @@ class TensorDataset():
 
     def __getitem__(self, index):
         img_path = self.data_list[index]
-        # label_path = img_path.split(".")[0] + ".txt"
         label_path = img_path.replace("images", "labels").replace(".jpg", ".txt")
-        # 归一化操作
-        img = cv2.imread(img_path)
-        img = cv2.resize(img, (self.img_size_width, self.img_size_height), interpolation = cv2.INTER_LINEAR) 
-        #数据增强
-        if self.imgaug == True:
-            img = img_aug(img)
-        img = img.transpose(2,0,1)
-
-        # 加载label文件
         if os.path.exists(label_path):
-            label = []
-            with open(label_path, 'r') as f:
-                for line in f.readlines():
-                    l = line.strip().split(" ")
-                    label.append([0, l[0], l[1], l[2], l[3], l[4]])
+            img = cv2.imread(img_path)
+
+            if self.imgaug:
+                bbox = []
+                bbox_classes = []
+                with open(label_path, "r") as label_buffer:
+                    for tmp in label_buffer:
+                        tmp_info = tmp.split(" ")
+                        bbox_classes.append(tmp_info[0])
+
+                        tmp_bbox = [float(tmp_p) for tmp_p in tmp_info[1:]]
+                        bbox.append(tmp_bbox)
+
+                    tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
+
+                    label = []
+                    for index, tmp_transformed_bbox in enumerate(tmp_transform["bboxes"]):
+                        label.append([0, bbox_classes[index],
+                                      tmp_transformed_bbox[0],
+                                      tmp_transformed_bbox[1],
+                                      tmp_transformed_bbox[2],
+                                      tmp_transformed_bbox[3]])
+
+                    img = tmp_transform["image"]
+            else:
+                img = cv2.resize(img, (self.img_size_width, self.img_size_height), interpolation=cv2.INTER_LINEAR)
+                label = []
+                with open(label_path, 'r') as f:
+                    for line in f.readlines():
+                        l = line.strip().split(" ")
+                        label.append([0, l[0], l[1], l[2], l[3], l[4]])
+
+            img = img.transpose(2, 0, 1)
             label = np.array(label, dtype=np.float32)
 
             if label.shape[0]:
