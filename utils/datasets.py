@@ -132,16 +132,16 @@ class TensorDataset():
 
                         tmp_bbox = [float(tmp_p) for tmp_p in tmp_info[1:]]
                         if tmp_bbox[2] / 2 > tmp_bbox[0]:
-                            tmp_bbox[0] = tmp_bbox[2] / 2 + 0.001
+                            tmp_bbox[0] = tmp_bbox[2] / 2
 
                         if tmp_bbox[0] + tmp_bbox[2] / 2 > 1:
-                            tmp_bbox[0] = tmp_bbox[2] / 2 - 0.001
+                            tmp_bbox[0] = tmp_bbox[2] / 2
 
                         if tmp_bbox[3] / 2 > tmp_bbox[1]:
-                            tmp_bbox[1] = tmp_bbox[3] / 2 + 0.001
+                            tmp_bbox[1] = tmp_bbox[3] / 2
 
                         if tmp_bbox[1] + tmp_bbox[3] / 2 > 1:
-                            tmp_bbox[1] = tmp_bbox[3] / 2 - 0.001
+                            tmp_bbox[1] = tmp_bbox[3] / 2
 
                         # for index, tmp_ in enumerate(tmp_bbox):
                         #     if tmp_ > 1:
