@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 bbox_classes = ["0"]
 trans = A.Compose([
-    A.RandomCrop(320, 320),
+    # A.RandomCrop(320, 320),
     A.HorizontalFlip(p=0.5),
     A.VerticalFlip(p=0.5),
     A.OneOf([
