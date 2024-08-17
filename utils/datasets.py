@@ -97,7 +97,7 @@ class TensorDataset():
                 A.MedianBlur(blur_limit=3, p=0.1),  # 中值滤波
                 A.Blur(blur_limit=3, p=0.1),  # 使用随机大小的内核模糊输入图像。
             ], p=0.2),
-            A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.1, rotate_limit=30, p=0.5),
+            A.ShiftScaleRotate(shift_limit=0.03, scale_limit=0.1, rotate_limit=30, p=0.5),
             # 随机应用仿射变换：平移，缩放和旋转输入
             A.RandomBrightnessContrast(p=0.2),  # 随机明亮对比度
             A.Resize(self.img_size_width, self.img_size_height),
@@ -119,63 +119,57 @@ class TensorDataset():
     def __getitem__(self, index):
         img_path = self.data_list[index]
         label_path = img_path.replace("images", "labels").replace(".jpg", ".txt")
-        try:
+        if os.path.exists(label_path):
+            img = cv2.imread(img_path)
 
-            if os.path.exists(label_path):
-                img = cv2.imread(img_path)
+            if self.imgaug:
+                bbox = []
+                bbox_classes = []
+                with open(label_path, "r") as label_buffer:
+                    for tmp in label_buffer:
+                        tmp_info = tmp.split(" ")
+                        bbox_classes.append(tmp_info[0])
 
-                if self.imgaug:
-                    bbox = []
-                    bbox_classes = []
-                    with open(label_path, "r") as label_buffer:
-                        for tmp in label_buffer:
-                            tmp_info = tmp.split(" ")
-                            bbox_classes.append(tmp_info[0])
+                        tmp_bbox = [float(tmp_p) for tmp_p in tmp_info[1:]]
+                        for index, tmp_ in enumerate(tmp_bbox):
+                            if tmp_ > 1:
+                                tmp_bbox[index] = 0.99
+                            elif tmp_ < 0:
+                                tmp_bbox[index] = 0.01
+                            else:
+                                continue
 
-                            tmp_bbox = [float(tmp_p) for tmp_p in tmp_info[1:]]
-                            for index, tmp_ in enumerate(tmp_bbox):
-                                if tmp_ > 1:
-                                    tmp_bbox[index] = 0.99
-                                elif tmp_ < 0:
-                                    tmp_bbox[index] = 0.01
-                                else:
-                                    continue
+                        bbox.append(tmp_bbox)
+                        tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
 
-                            bbox.append(tmp_bbox)
-
-                            tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
-
-
-                        label = []
-                        for index, tmp_transformed_bbox in enumerate(tmp_transform["bboxes"]):
-                            label.append([0, bbox_classes[index],
-                                          tmp_transformed_bbox[0],
-                                          tmp_transformed_bbox[1],
-                                          tmp_transformed_bbox[2],
-                                          tmp_transformed_bbox[3]])
-
-                        img = tmp_transform["image"]
-                else:
-                    img = cv2.resize(img, (self.img_size_width, self.img_size_height), interpolation=cv2.INTER_LINEAR)
                     label = []
-                    with open(label_path, 'r') as f:
-                        for line in f.readlines():
-                            l = line.strip().split(" ")
-                            label.append([0, l[0], l[1], l[2], l[3], l[4]])
+                    for index, tmp_transformed_bbox in enumerate(tmp_transform["bboxes"]):
+                        label.append([0, bbox_classes[index],
+                                      tmp_transformed_bbox[0],
+                                      tmp_transformed_bbox[1],
+                                      tmp_transformed_bbox[2],
+                                      tmp_transformed_bbox[3]])
 
-                img = img.transpose(2, 0, 1)
-                label = np.array(label, dtype=np.float32)
-
-                if label.shape[0]:
-                    assert label.shape[1] == 6, '> 5 label columns: %s' % label_path
-                    #assert (label >= 0).all(), 'negative labels: %s'%label_path
-                    #assert (label[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels: %s'%label_path
+                    img = tmp_transform["image"]
             else:
-                raise Exception("%s is not exist" % label_path)
+                img = cv2.resize(img, (self.img_size_width, self.img_size_height), interpolation=cv2.INTER_LINEAR)
+                label = []
+                with open(label_path, 'r') as f:
+                    for line in f.readlines():
+                        l = line.strip().split(" ")
+                        label.append([0, l[0], l[1], l[2], l[3], l[4]])
 
-            return torch.from_numpy(img), torch.from_numpy(label)
-        except ValueError:
-            print(label_path)
+            img = img.transpose(2, 0, 1)
+            label = np.array(label, dtype=np.float32)
+
+            if label.shape[0]:
+                assert label.shape[1] == 6, '> 5 label columns: %s' % label_path
+                #assert (label >= 0).all(), 'negative labels: %s'%label_path
+                #assert (label[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels: %s'%label_path
+        else:
+            raise Exception("%s is not exist" % label_path)
+
+        return torch.from_numpy(img), torch.from_numpy(label)
 
     def __len__(self):
         return len(self.data_list)
