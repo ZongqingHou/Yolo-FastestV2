@@ -100,7 +100,7 @@ class TensorDataset():
             # A.ShiftScaleRotate(shift_limit=0.03, scale_limit=0.1, rotate_limit=30, p=0.5),
             # 随机应用仿射变换：平移，缩放和旋转输入
             A.RandomBrightnessContrast(p=0.2),  # 随机明亮对比度
-            # A.Resize(self.img_size_width, self.img_size_height),
+            A.Resize(self.img_size_width, self.img_size_height),
         ], bbox_params=A.BboxParams(format="yolo", label_fields=["bbox_classes"]))
 
         # 数据检查
@@ -131,13 +131,13 @@ class TensorDataset():
                         bbox_classes.append(tmp_info[0])
 
                         tmp_bbox = [float(tmp_p) for tmp_p in tmp_info[1:]]
-                        for index, tmp_ in enumerate(tmp_bbox):
-                            if tmp_ > 1:
-                                tmp_bbox[index] = 0.99
-                            elif tmp_ < 0:
-                                tmp_bbox[index] = 0.01
-                            else:
-                                continue
+                        # for index, tmp_ in enumerate(tmp_bbox):
+                        #     if tmp_ > 1:
+                        #         tmp_bbox[index] = 0.99
+                        #     elif tmp_ < 0:
+                        #         tmp_bbox[index] = 0.01
+                        #     else:
+                        #         continue
 
                         bbox.append(tmp_bbox)
                         tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
