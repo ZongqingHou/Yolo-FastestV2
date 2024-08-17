@@ -76,7 +76,7 @@ def collate_fn(batch):
     return torch.stack(img), torch.cat(label, 0)
 
 class TensorDataset():
-    def __init__(self, path, img_size_width = 352, img_size_height = 352, imgaug = False):
+    def __init__(self, path, img_size_width = 320, img_size_height = 320, imgaug = False):
         assert os.path.exists(path), "%s文件路径错误或不存在" % path
 
         self.path = path
@@ -100,7 +100,7 @@ class TensorDataset():
             # A.ShiftScaleRotate(shift_limit=0.03, scale_limit=0.1, rotate_limit=30, p=0.5),
             # 随机应用仿射变换：平移，缩放和旋转输入
             A.RandomBrightnessContrast(p=0.2),  # 随机明亮对比度
-            A.Resize(self.img_size_width, self.img_size_height),
+            # A.Resize(self.img_size_width, self.img_size_height),
         ], bbox_params=A.BboxParams(format="yolo", label_fields=["bbox_classes"]))
 
         # 数据检查
