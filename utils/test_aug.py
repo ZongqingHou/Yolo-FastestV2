@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 bbox_classes = ["0"]
 trans = A.Compose([
+    A.RandomCrop(320, 320),
     A.HorizontalFlip(p=0.5),
     A.VerticalFlip(p=0.5),
     A.OneOf([
@@ -32,6 +33,19 @@ with open("/home/hdd/Desktop/val/labels/00072_4.txt", "r") as buffer:
         # tmp_pp[1] = tmp_pp[1] * 960
         # tmp_pp[2] = tmp_pp[2] * 720
         # tmp_pp[3] = tmp_pp[3] * 960
+
+
+
+
+
+
+
+
+
+
+
+
+
         bbox.append(tmp_pp)
 
     tt = trans(image=img, bboxes=bbox, bbox_classes=bbox_classes)

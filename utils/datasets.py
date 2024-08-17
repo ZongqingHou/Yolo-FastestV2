@@ -141,7 +141,10 @@ class TensorDataset():
 
                         bbox.append(tmp_bbox)
 
-                    tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
+                    try:
+                        tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
+                    except ValueError:
+                        print(label_path)
 
                     label = []
                     for index, tmp_transformed_bbox in enumerate(tmp_transform["bboxes"]):
