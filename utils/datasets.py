@@ -91,13 +91,13 @@ class TensorDataset():
             A.VerticalFlip(p=0.5),
             A.OneOf([
                 A.GaussNoise(),  # 将高斯噪声应用于输入图像。
-            ], p=0.2),  # 应用选定变换的概率
+            ], p=0.4),  # 应用选定变换的概率
             A.OneOf([
                 A.MotionBlur(p=0.2),  # 使用随机大小的内核将运动模糊应用于输入图像。
                 A.MedianBlur(blur_limit=3, p=0.1),  # 中值滤波
                 A.Blur(blur_limit=3, p=0.1),  # 使用随机大小的内核模糊输入图像。
-            ], p=0.2),
-            # A.ShiftScaleRotate(shift_limit=0.03, scale_limit=0.1, rotate_limit=30, p=0.5),
+            ], p=0.5),
+            A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.8),
             # 随机应用仿射变换：平移，缩放和旋转输入
             A.RandomBrightnessContrast(p=0.2),  # 随机明亮对比度
             A.Resize(self.img_size_width, self.img_size_height),
@@ -152,8 +152,8 @@ class TensorDataset():
                         #         continue
 
                         bbox.append(tmp_bbox)
-                        tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
 
+                    tmp_transform = self.imgaug_operation(image=img, bboxes=bbox, bbox_classes=bbox_classes)
                     label = []
                     for index, tmp_transformed_bbox in enumerate(tmp_transform["bboxes"]):
                         label.append([0, bbox_classes[index],
