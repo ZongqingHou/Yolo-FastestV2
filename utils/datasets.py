@@ -123,6 +123,9 @@ class TensorDataset():
 
         label_path = self.data_list[index]
         img_path = label_path.replace("labels", "images").replace(".txt", ".jpg")
+
+        if not os.path.exists(img_path):
+            img_path = img_path = label_path.replace("labels", "images").replace(".txt", ".JPG")
         # print(label_path)
         # print(img_path)
         if os.path.exists(label_path) and os.path.exists(img_path):
