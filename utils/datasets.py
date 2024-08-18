@@ -117,8 +117,11 @@ class TensorDataset():
                     raise Exception("%s is not exist" % data_path)
 
     def __getitem__(self, index):
-        img_path = self.data_list[index]
-        label_path = img_path.replace("images", "labels").replace(".jpg", ".txt")
+        # img_path = self.data_list[index]
+        # label_path = img_path.replace("images", "labels").replace(".jpg", ".txt")
+
+        label_path = self.data_list[index]
+        img_path = label_path.replace("labels", "images").replace(".txt", ".jpg")
         if os.path.exists(label_path):
             img = cv2.imread(img_path)
 
