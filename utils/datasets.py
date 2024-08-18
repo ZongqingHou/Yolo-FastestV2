@@ -124,7 +124,7 @@ class TensorDataset():
         label_path = self.data_list[index]
         img_path = label_path.replace("labels", "images").replace(".txt", ".jpg")
         # print(label_path)
-        print(img_path)
+        # print(img_path)
         if os.path.exists(label_path) and os.path.exists(img_path):
             img = cv2.imread(img_path)
 
@@ -190,7 +190,7 @@ class TensorDataset():
                 #assert (label >= 0).all(), 'negative labels: %s'%label_path
                 #assert (label[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels: %s'%label_path
         else:
-            raise Exception("%s is not exist, %s" % img_path)
+            raise Exception("%s is not exist" % img_path)
 
         return torch.from_numpy(img), torch.from_numpy(label)
 
