@@ -131,6 +131,11 @@ class TensorDataset():
                         bbox_classes.append(tmp_info[0])
 
                         tmp_bbox = [float(tmp_p) for tmp_p in tmp_info[1:]]
+
+                        if "minimum_x_y" in label_path:
+                            tmp_bbox[0] = tmp_bbox[0] + tmp_bbox[2] / 2
+                            tmp_bbox[1] = tmp_bbox[1] + tmp_bbox[3] / 2
+
                         if tmp_bbox[2] / 2 > tmp_bbox[0]:
                             tmp_bbox[0] = tmp_bbox[2] / 2
 

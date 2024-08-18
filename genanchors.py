@@ -130,12 +130,12 @@ def main(argv):
     size = np.zeros((1,1,3))
     for line in lines:
                     
-        line = line.replace('images','labels')
-        #line = line.replace('img1','labels')
-        #line = line.replace('JPE','labels')        
-        
-
-        line = line.replace('.jpg','.txt')
+        # line = line.replace('images','labels')
+        # #line = line.replace('img1','labels')
+        # #line = line.replace('JPE','labels')
+        #
+        #
+        # line = line.replace('.jpg','.txt')
         #line = line.replace('.png','.txt')
         print(line)
         f2 = open(line)

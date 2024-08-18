@@ -14,9 +14,9 @@ classes=2
 width=320
 height=320
 anchor_num=3
-anchors=24.08,76.09, 48.48,71.81, 80.13,33.27, 83.88,130.98, 127.85,78.46, 170.79,140.90
+anchors=25.39,74.40, 52.32,78.22, 70.09,26.74, 75.23,47.61, 98.51,132.32, 132.32,86.39
 
 [data-configure]
-train=/home/houzongqing/test.txt
+train=/home/houzongqing/palmDatasetDetection.txt
 val=/home/houzongqing/test.txt
 names=./data/palm.names
