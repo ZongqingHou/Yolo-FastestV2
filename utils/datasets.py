@@ -108,11 +108,12 @@ class TensorDataset():
             for line in f.readlines():
                 data_path = line.strip()
                 if os.path.exists(data_path):
-                    img_type = data_path.split(".")[-1]
-                    if img_type not in self.img_formats:
-                        raise Exception("img type error:%s" % img_type)
-                    else:
-                        self.data_list.append(data_path)
+                    # img_type = data_path.split(".")[-1]
+                    # if img_type not in self.img_formats:
+                    #     raise Exception("img type error:%s" % img_type)
+                    # else:
+                    #     self.data_list.append(data_path)
+                    self.data_list.append(data_path)
                 else:
                     raise Exception("%s is not exist" % data_path)
 
