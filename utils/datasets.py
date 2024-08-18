@@ -190,7 +190,7 @@ class TensorDataset():
                 #assert (label >= 0).all(), 'negative labels: %s'%label_path
                 #assert (label[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels: %s'%label_path
         else:
-            raise Exception("%s is not exist" % label_path)
+            raise Exception("%s is not exist, %s" % img_path)
 
         return torch.from_numpy(img), torch.from_numpy(label)
 
